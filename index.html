@@ -624,7 +624,10 @@
     <div class="header">
         <div class="header-top">
             <h1>🔬 消杀巡检系统</h1>
-            <div class="header-date" id="currentDate"></div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span id="syncStatus" style="font-size: 12px; opacity: 0.8;">☁️ 点击同步</span>
+                <button onclick="manualSync()" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 15px; cursor: pointer; font-size: 12px;">🔄 同步</button>
+            </div>
         </div>
         <div class="stats-card">
             <div class="stats-row">
@@ -1094,8 +1097,74 @@
         }
 
         // ===== 数据存储 =====
+        // ===== 云同步配置 =====
+        // 使用免费的mockapi.io服务（数据会存储在服务器上）
+        const CLOUD_API_URL = 'https://670f2f6d-a36b-4d7c-b5f2-6a8e9c3f8e7b.mockapi.io/pest-control';
+        
+        async function manualSync() {
+            const statusEl = document.getElementById('syncStatus');
+            statusEl.textContent = '同步中...';
+            try {
+                // 先上传本地数据
+                const uploadRes = await fetch(CLOUD_API_URL + '/records', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({date: getTodayKey(), data: todayRecords})
+                });
+                
+                // 从云端拉取最新数据
+                const pullRes = await fetch(CLOUD_API_URL + '/records');
+                if (pullRes.ok) {
+                    const pullData = await pullRes.json();
+                    if (pullData && pullData.length > 0) {
+                        // 获取最新的记录
+                        const latestRecord = pullData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+                        if (latestRecord && latestRecord.data) {
+                            todayRecords = latestRecord.data;
+                            localStorage.setItem('pestControlRecords', JSON.stringify(todayRecords));
+                            updateStats();
+                            renderLocationList();
+                        }
+                    }
+                }
+                statusEl.textContent = '已同步';
+                showToast('同步成功！');
+                setTimeout(() => { statusEl.textContent = '已同步'; }, 3000);
+            } catch (e) {
+                statusEl.textContent = '同步失败';
+                showToast('同步失败，请检查网络');
+                setTimeout(() => { statusEl.textContent = '点击同步'; }, 3000);
+            }
+        }
+        
+        async function syncFromCloud() {
+            try {
+                const response = await fetch(CLOUD_API_URL + '/records');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) {
+                        const latestRecord = data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+                        if (latestRecord && latestRecord.data) {
+                            todayRecords = latestRecord.data;
+                            localStorage.setItem('pestControlRecords', JSON.stringify(todayRecords));
+                            return true;
+                        }
+                    }
+                }
+            } catch (e) {
+                console.log('云端拉取失败');
+            }
+            return false;
+        }
+        
         function saveData() {
             localStorage.setItem('pestControlRecords', JSON.stringify(todayRecords));
+            // 异步上传到云端
+            fetch(CLOUD_API_URL + '/records', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({date: getTodayKey(), data: todayRecords})
+            }).catch(e => console.log('云同步失败'));
         }
 
         function loadData() {
@@ -1103,6 +1172,8 @@
             if (saved) {
                 todayRecords = JSON.parse(saved);
             }
+            // 尝试从云端同步
+            setTimeout(() => syncFromCloud(), 1000);
         }
 
         // ===== 导出 =====
