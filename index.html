@@ -1092,7 +1092,13 @@
         }
 
         // ===== 提交 =====
+        // 全局测试函数（用于调试）
+        window.testSubmit = function() {
+            alert('testSubmit 函数正常！');
+        };
+
         function submitCheck() {
+            alert('submitCheck 被调用！');
             console.log('submitCheck 被调用');
             console.log('currentPhoto:', currentPhoto);
             console.log('currentLocationId:', currentLocationId);
