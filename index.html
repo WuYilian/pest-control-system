@@ -750,7 +750,7 @@
                     <textarea class="form-input" id="remarkInput" rows="3" placeholder="请输入巡检情况说明（选填）"></textarea>
                 </div>
 
-                <button class="submit-btn" id="submitBtn" onclick="submitCheck()">
+                <button type="button" class="submit-btn" id="submitBtn" onclick="submitCheck()">
                     ✅ 确认巡检完成
                 </button>
             </div>
@@ -1093,7 +1093,6 @@
 
         // ===== 提交 =====
         function submitCheck() {
-            alert('submitCheck 被调用！');
             console.log('submitCheck 被调用');
             console.log('currentPhoto:', currentPhoto);
             console.log('currentLocationId:', currentLocationId);
@@ -1324,8 +1323,6 @@
             loadData(); // loadData会调用renderLocationList
             console.log('5. 初始化完成');
             
-            // 微信兼容：为按钮添加事件监听
-            document.getElementById('submitBtn').addEventListener('click', submitCheck);
             // 直接监听文件输入的变化
             document.getElementById('inlinePhotoInput').addEventListener('change', function(e) {
                 handlePhotoFromGlobal(this);
