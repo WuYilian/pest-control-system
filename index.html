@@ -1294,9 +1294,10 @@
             });
         });
 
-        // 点击外部关闭弹窗
+        // 点击外部关闭弹窗（更精确的判断）
         document.getElementById('checkModal').addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal-overlay')) {
+            // 只有直接点击 modal-overlay（背景）才关闭，点击子元素不关闭
+            if (e.target === e.currentTarget) {
                 closeModal();
             }
         });
@@ -1318,10 +1319,7 @@
             
             // 微信兼容：为按钮添加事件监听
             document.getElementById('submitBtn').addEventListener('click', submitCheck);
-            document.getElementById('photoUpload').addEventListener('click', function(e) {
-                e.stopPropagation(); // 阻止冒泡，防止触发modal-overlay关闭
-                triggerPhotoUpload();
-            });
+            document.getElementById('photoUpload').addEventListener('click', triggerPhotoUpload);
         }
 
         // 微信兼容：使用 addEventListener
