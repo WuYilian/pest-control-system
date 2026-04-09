@@ -277,9 +277,23 @@
             border-radius: 20px 20px 0 0;
             width: 100%;
             max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
             animation: slideUp 0.3s ease;
+        }
+        
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+        
+        /* 确保模态框不遮挡底部按钮 */
+        .modal-content {
+            padding-bottom: 70px;
         }
 
         @keyframes slideUp {
@@ -317,19 +331,7 @@
             cursor: pointer;
         }
 
-        .modal-body {
-            padding: 20px;
-            padding-bottom: calc(20px + env(safe-area-inset-bottom));
-        }
-        
-        .modal-footer {
-            padding: 15px 20px;
-            padding-bottom: calc(15px + env(safe-area-inset-bottom));
-            border-top: 1px solid #eee;
-            background: white;
-            position: sticky;
-            bottom: 0;
-        }
+
 
         .form-group {
             margin-bottom: 20px;
@@ -393,12 +395,19 @@
         }
 
         .submit-btn {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
             width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
             padding: 16px 20px;
+            padding-bottom: calc(16px + env(safe-area-inset-bottom));
             background: #1a73e8;
             color: white;
             border: none;
-            border-radius: 12px;
+            border-radius: 0;
             font-size: 17px;
             font-weight: 600;
             cursor: pointer;
@@ -406,8 +415,9 @@
             touch-action: manipulation;
             -webkit-appearance: none;
             user-select: none;
-            min-height: 54px;
+            min-height: 60px;
             box-sizing: border-box;
+            z-index: 300;
         }
 
         .submit-btn:active {
@@ -753,8 +763,7 @@
                     <label class="form-label">📝 备注说明</label>
                     <textarea class="form-input" id="remarkInput" rows="3" placeholder="请输入巡检情况说明（选填）"></textarea>
                 </div>
-            </div>
-            <div class="modal-footer">
+
                 <button class="submit-btn" id="submitBtn" onclick="submitCheck()">
                     ✅ 确认巡检完成
                 </button>
