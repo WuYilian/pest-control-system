@@ -750,7 +750,7 @@
                     <textarea class="form-input" id="remarkInput" rows="3" placeholder="请输入巡检情况说明（选填）"></textarea>
                 </div>
 
-                <button type="button" class="submit-btn" id="submitBtn" onclick="submitCheck()">
+                <button type="button" class="submit-btn" id="submitBtn" onclick="doSubmitInspection()">
                     ✅ 确认巡检完成
                 </button>
             </div>
@@ -1103,15 +1103,15 @@
                 const btn = document.getElementById('submitBtn');
                 if (btn) {
                     btn.onclick = function() {
-                        submitCheck();
+                        doSubmitInspection();
                     };
                 }
             }, 500);
         });
 
-        function submitCheck() {
-            alert('1. submitCheck 开始');
-            console.log('submitCheck 被调用');
+        function doSubmitInspection() {
+            alert('🚀 doSubmitInspection 开始！');
+            console.log('doSubmitInspection 被调用');
             console.log('currentPhoto:', currentPhoto);
             console.log('currentLocationId:', currentLocationId);
 
