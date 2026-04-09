@@ -738,11 +738,11 @@
 
                 <div class="form-group">
                     <label class="form-label">📸 现场照片（必填）</label>
-                    <div class="photo-upload" id="photoUpload">
+                    <label class="photo-upload" id="photoUpload" for="inlinePhotoInput">
                         <input type="file" id="inlinePhotoInput" accept="image/*" capture="environment" style="display:none">
                         <div class="photo-upload-icon">📷</div>
                         <div class="photo-upload-text">点击上传照片</div>
-                    </div>
+                    </label>
                 </div>
 
                 <div class="form-group">
@@ -1038,10 +1038,15 @@
             document.getElementById('locationInfo').textContent = '尚未获取定位';
             document.getElementById('remarkInput').value = '';
             document.getElementById('photoUpload').innerHTML = `
+                <input type="file" id="inlinePhotoInput" accept="image/*" capture="environment" style="display:none">
                 <div class="photo-upload-icon">📷</div>
                 <div class="photo-upload-text">点击上传照片</div>
             `;
             document.getElementById('photoUpload').classList.remove('has-photo');
+            // 重新绑定事件
+            document.getElementById('inlinePhotoInput').addEventListener('change', function(e) {
+                handlePhotoFromGlobal(this);
+            });
         }
 
         // ===== 定位 =====
