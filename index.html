@@ -1110,22 +1110,25 @@
         });
 
         function submitCheck() {
-            alert('submitCheck 被调用！');
+            alert('1. submitCheck 开始');
             console.log('submitCheck 被调用');
             console.log('currentPhoto:', currentPhoto);
             console.log('currentLocationId:', currentLocationId);
 
             const today = getTodayKey();
+            alert('2. today=' + today);
 
             // 验证
             if (!currentPhoto) {
                 alert('请先上传现场照片');
                 return;
             }
+            alert('3. 照片验证通过');
 
             if (!todayRecords[today]) {
                 todayRecords[today] = {};
             }
+            alert('4. 保存记录');
 
             todayRecords[today][currentLocationId] = {
                 time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }),
@@ -1134,9 +1137,13 @@
                 remark: document.getElementById('remarkInput').value
             };
 
+            alert('5. 调用 saveData');
             saveData();
+            alert('6. 调用 updateStats');
             updateStats();
+            alert('7. 调用 renderLocationList');
             renderLocationList(getCurrentFilter());
+            alert('8. 调用 closeModal');
             closeModal();
             alert('✓ 巡检记录已保存');
         }
