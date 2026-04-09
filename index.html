@@ -1036,6 +1036,11 @@
             // 清空input以便重复选择同一文件
             input.value = '';
         }
+        
+        // 触发文件选择
+        function triggerPhotoUpload() {
+            document.getElementById('globalPhotoInput').click();
+        }
 
         function closeModal() {
             document.getElementById('checkModal').classList.remove('show');
@@ -1341,7 +1346,7 @@
             }
             // 点击照片区域
             if (e.target && e.target.closest('#photoUpload')) {
-                document.getElementById('photoInput').click();
+                triggerPhotoUpload();
             }
         });
     </script>
