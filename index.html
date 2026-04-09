@@ -624,6 +624,7 @@
     <div class="header">
         <div class="header-top">
             <h1>🔬 消杀巡检系统</h1>
+            <div id="currentDate" style="font-size: 12px; opacity: 0.8;"></div>
             <div style="display: flex; align-items: center; gap: 10px;">
                 <span id="syncStatus" style="font-size: 12px; opacity: 0.8;">☁️ 点击同步</span>
                 <button onclick="manualSync()" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 15px; cursor: pointer; font-size: 12px;">🔄 同步</button>
@@ -792,7 +793,12 @@
         }
         
         function renderLocationList(filter = 'all') {
+            console.log('renderLocationList 被调用, filter:', filter, 'locations:', locations.length);
             const list = document.getElementById('locationList');
+            if (!list) {
+                console.error('找不到 locationList 元素!');
+                return;
+            }
             const today = getTodayKey();
             
             // 更新筛选按钮状态
@@ -1099,7 +1105,7 @@
         // ===== 数据存储 =====
         // ===== 云同步配置 =====
         // 使用免费的mockapi.io服务（数据会存储在服务器上）
-        const CLOUD_API_URL = 'https://670f2f6d-a36b-4d7c-b5f2-6a8e9c3f8e7b.mockapi.io/pest-control';
+        const CLOUD_API_URL = 'https://69d7913b9c5ebb0918c7f4d4.mockapi.io/wyl19991220';
         
         async function manualSync() {
             const statusEl = document.getElementById('syncStatus');
@@ -1168,12 +1174,23 @@
         }
 
         function loadData() {
-            const saved = localStorage.getItem('pestControlRecords');
-            if (saved) {
-                todayRecords = JSON.parse(saved);
+            try {
+                const saved = localStorage.getItem('pestControlRecords');
+                if (saved) {
+                    todayRecords = JSON.parse(saved);
+                }
+            } catch (e) {
+                console.log('本地数据加载失败，使用空数据');
+                todayRecords = {};
             }
-            // 尝试从云端同步
-            setTimeout(() => syncFromCloud(), 1000);
+            // 先显示列表
+            updateStats();
+            renderLocationList();
+            // 尝试从云端同步（异步，不阻塞）
+            syncFromCloud().then(() => {
+                updateStats();
+                renderLocationList();
+            });
         }
 
         // ===== 导出 =====
@@ -1246,14 +1263,18 @@
 
         // ===== 初始化 =====
         function init() {
+            console.log('1. 开始初始化...');
             document.getElementById('currentDate').textContent = new Date().toLocaleDateString('zh-CN', {
                 year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'
             });
 
+            console.log('2. 加载点位数据...');
             initLocations();
-            loadData();
-            updateStats();
-            renderLocationList();
+            console.log('3. 点位数量:', locations.length);
+            
+            console.log('4. 加载本地数据...');
+            loadData(); // loadData会调用renderLocationList
+            console.log('5. 初始化完成');
         }
 
         init();
