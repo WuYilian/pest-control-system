@@ -738,7 +738,7 @@
 
                 <div class="form-group">
                     <label class="form-label">📸 现场照片（必填）</label>
-                    <div class="photo-upload" id="photoUpload">
+                    <div class="photo-upload" id="photoUpload" onclick="triggerPhotoUpload(); return false;">
                         <div class="photo-upload-icon">📷</div>
                         <div class="photo-upload-text">点击上传照片</div>
                     </div>
@@ -749,7 +749,7 @@
                     <textarea class="form-input" id="remarkInput" rows="3" placeholder="请输入巡检情况说明（选填）"></textarea>
                 </div>
 
-                <button class="submit-btn" id="submitBtn">
+                <button class="submit-btn" id="submitBtn" onclick="submitCheck(); return false;">
                     ✅ 确认巡检完成
                 </button>
             </div>
