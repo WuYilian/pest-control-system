@@ -1065,11 +1065,15 @@
 
         // ===== 提交 =====
         function submitCheck() {
+            console.log('submitCheck 被调用');
+            console.log('currentPhoto:', currentPhoto);
+            console.log('currentLocationId:', currentLocationId);
+            
             const today = getTodayKey();
 
             // 验证
             if (!currentPhoto) {
-                showToast('请先上传现场照片');
+                alert('请先上传现场照片');
                 return;
             }
 
@@ -1088,7 +1092,7 @@
             updateStats();
             renderLocationList(getCurrentFilter());
             closeModal();
-            showToast('✓ 巡检记录已保存');
+            alert('✓ 巡检记录已保存');
         }
 
         // ===== 工具函数 =====
