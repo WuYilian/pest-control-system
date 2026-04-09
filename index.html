@@ -1097,6 +1097,18 @@
             alert('testSubmit 函数正常！');
         };
 
+        // 页面加载后立即设置备用点击事件
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                const btn = document.getElementById('submitBtn');
+                if (btn) {
+                    btn.onclick = function() {
+                        submitCheck();
+                    };
+                }
+            }, 500);
+        });
+
         function submitCheck() {
             alert('submitCheck 被调用！');
             console.log('submitCheck 被调用');
