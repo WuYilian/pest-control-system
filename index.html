@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>消杀巡检系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f5f6fa;
+            min-height: 100vh;
+        }
+
+        /* 顶部导航 */
+        .header {
+            background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+            color: white;
+            padding: 16px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(26, 115, 232, 0.3);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .header-date {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        /* 统计卡片 */
+        .stats-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 16px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stats-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .stats-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .stats-label {
+            font-size: 12px;
+            opacity: 0.85;
+            margin-top: 4px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            margin-top: 12px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: white;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        /* 切换标签 */
+        .tabs {
+            display: flex;
+            background: white;
+            padding: 0 16px;
+            position: sticky;
+            top: 100px;
+            z-index: 99;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 14px 0;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: #1a73e8;
+            border-bottom-color: #1a73e8;
+            font-weight: 600;
+        }
+
+        /* 内容区 */
+        .content {
+            padding: 16px;
+            padding-bottom: 100px;
+        }
+
+        /* 筛选区 */
+        .filter-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            border: 1px solid #ddd;
+            background: white;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active {
+            background: #1a73e8;
+            color: white;
+            border-color: #1a73e8;
+        }
+
+        /* 点位列表 */
+        .location-item {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s;
+        }
+
+        .location-item.completed {
+            border-left: 4px solid #34a853;
+        }
+
+        .location-item.pending {
+            border-left: 4px solid #fbbc04;
+        }
+
+        .location-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .location-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .location-area {
+            font-size: 12px;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .status-badge.done {
+            background: #e6f4ea;
+            color: #34a853;
+        }
+
+        .status-badge.pending {
+            background: #fef7e0;
+            color: #f9a825;
+        }
+
+        .location-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .detail-item img {
+            width: 14px;
+            height: 14px;
+            opacity: 0.7;
+        }
+
+        /* 巡检按钮 */
+        .check-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .check-btn.doing {
+            background: #1a73e8;
+            color: white;
+        }
+
+        .check-btn.doing:active {
+            background: #1557b0;
+        }
+
+        .check-btn.completed {
+            background: #e6f4ea;
+            color: #34a853;
+        }
+
+        /* 弹窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 200;
+            display: none;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 20px 20px 0 0;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: white;
+        }
+
+        .modal-title {
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: #f5f6fa;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #1a73e8;
+        }
+
+        .photo-upload {
+            border: 2px dashed #ddd;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fafafa;
+        }
+
+        .photo-upload:hover {
+            border-color: #1a73e8;
+            background: #f0f7ff;
+        }
+
+        .photo-upload.has-photo {
+            padding: 10px;
+        }
+
+        .photo-upload img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+        }
+
+        .photo-upload-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .photo-upload-text {
+            color: #888;
+            font-size: 13px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .submit-btn:active {
+            background: #1557b0;
+        }
+
+        /* 统计页面 */
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .stat-title {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .stat-big-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #1a73e8;
+        }
+
+        .stat-big-value.success {
+            color: #34a853;
+        }
+
+        .stat-big-value.warning {
+            color: #f9a825;
+        }
+
+        .week-chart {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            height: 120px;
+            padding-top: 20px;
+        }
+
+        .chart-bar {
+            width: 40px;
+            background: linear-gradient(to top, #1a73e8, #4fc3f7);
+            border-radius: 6px 6px 0 0;
+            position: relative;
+            transition: height 0.5s ease;
+        }
+
+        .chart-bar.zero {
+            background: #e0e0e0;
+        }
+
+        .chart-label {
+            position: absolute;
+            bottom: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: #888;
+        }
+
+        .chart-value {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* 历史记录 */
+        .record-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .record-item:last-child {
+            border-bottom: none;
+        }
+
+        .record-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 18px;
+        }
+
+        .record-icon.success {
+            background: #e6f4ea;
+        }
+
+        .record-icon.warning {
+            background: #fef7e0;
+        }
+
+        .record-info {
+            flex: 1;
+        }
+
+        .record-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .record-time {
+            font-size: 12px;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        /* 底部操作栏 */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 12px 20px;
+            padding-bottom: max(12px, env(safe-area-inset-bottom));
+            display: flex;
+            gap: 12px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .bar-btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .bar-btn.primary {
+            background: #1a73e8;
+            color: white;
+        }
+
+        .bar-btn.secondary {
+            background: #f5f6fa;
+            color: #333;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+        }
+
+        .empty-icon {
+            font-size: 60px;
+            margin-bottom: 16px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 16px 32px;
+            border-radius: 10px;
+            z-index: 300;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        /* 隐藏类 */
+        .hidden {
+            display: none !important;
+        }
+
+        /* 定位按钮 */
+        .location-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 14px;
+            background: #f0f7ff;
+            border: 1px solid #1a73e8;
+            border-radius: 8px;
+            color: #1a73e8;
+            font-size: 13px;
+            cursor: pointer;
+            margin-bottom: 12px;
+        }
+
+        .location-btn:active {
+            background: #e3f2fd;
+        }
+
+        .location-info {
+            font-size: 12px;
+            color: #666;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <div class="header">
+        <div class="header-top">
+            <h1>🔬 消杀巡检系统</h1>
+            <div class="header-date" id="currentDate"></div>
+        </div>
+        <div class="stats-card">
+            <div class="stats-row">
+                <div class="stats-item">
+                    <div class="stats-value" id="completedCount">0</div>
+                    <div class="stats-label">已完成</div>
+                </div>
+                <div class="stats-item">
+                    <div class="stats-value" id="pendingCount">0</div>
+                    <div class="stats-label">待巡检</div>
+                </div>
+                <div class="stats-item">
+                    <div class="stats-value" id="totalCount">70</div>
+                    <div class="stats-label">总点位</div>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 切换标签 -->
+    <div class="tabs">
+        <div class="tab active" data-tab="list">📍 巡检列表</div>
+        <div class="tab" data-tab="stats">📊 统计报表</div>
+        <div class="tab" data-tab="history">📋 历史记录</div>
+    </div>
+
+    <!-- 内容区 -->
+    <div class="content">
+        <!-- 巡检列表页 -->
+        <div id="listPage">
+            <div class="filter-bar">
+                <button class="filter-btn active" data-filter="all">全部</button>
+                <button class="filter-btn" data-filter="pending">待巡检</button>
+                <button class="filter-btn" data-filter="completed">已完成</button>
+            </div>
+            <div id="locationList"></div>
+        </div>
+
+        <!-- 统计报表页 -->
+        <div id="statsPage" class="hidden">
+            <div class="stat-card">
+                <div class="stat-title">今日完成率</div>
+                <div class="stat-big-value" id="todayRate">0%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">本周完成率</div>
+                <div class="week-chart" id="weekChart"></div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">本月累计巡检</div>
+                <div class="stat-big-value success" id="monthCount">0 次</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">连续达标天数</div>
+                <div class="stat-big-value" id="streakDays">0 天</div>
+            </div>
+        </div>
+
+        <!-- 历史记录页 -->
+        <div id="historyPage" class="hidden">
+            <div id="historyList"></div>
+        </div>
+    </div>
+
+    <!-- 底部操作栏 -->
+    <div class="bottom-bar">
+        <button class="bar-btn secondary" onclick="markAllPending()">
+            ⚠️ 标记全部待巡检
+        </button>
+        <button class="bar-btn primary" onclick="exportData()">
+            📤 导出报表
+        </button>
+    </div>
+
+    <!-- 巡检弹窗 -->
+    <div class="modal-overlay" id="checkModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">点位巡检</div>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">点位信息</label>
+                    <div class="location-info" id="modalLocationInfo"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">📍 当前定位</label>
+                    <button class="location-btn" onclick="getLocation()">
+                        📍 点击获取当前位置
+                    </button>
+                    <div class="location-info" id="locationInfo">尚未获取定位</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">📸 现场照片（必填）</label>
+                    <div class="photo-upload" id="photoUpload" onclick="document.getElementById('photoInput').click()">
+                        <div class="photo-upload-icon">📷</div>
+                        <div class="photo-upload-text">点击上传照片</div>
+                    </div>
+                    <input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(this)">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">📝 备注说明</label>
+                    <textarea class="form-input" id="remarkInput" rows="3" placeholder="请输入巡检情况说明（选填）"></textarea>
+                </div>
+
+                <button class="submit-btn" onclick="submitCheck()">
+                    ✅ 确认巡检完成
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== 数据定义 =====
+        let locations = [];
+        let todayRecords = {};
+        let historyRecords = [];
+        let currentLocation = null;
+        let currentPhoto = null;
+        let currentLocationId = null;
+
+        // 初始化点位数据（70个示例点位）
+        function initLocations() {
+            const areas = [
+                { name: 'A区 - 楼道', prefix: 'A', count: 15 },
+                { name: 'B区 - 电梯间', prefix: 'B', count: 12 },
+                { name: 'C区 - 地下室', prefix: 'C', count: 10 },
+                { name: 'D区 - 垃圾房', prefix: 'D', count: 8 },
+                { name: 'E区 - 绿化带', prefix: 'E', count: 10 },
+                { name: 'F区 - 停车场', prefix: 'F', count: 15 }
+            ];
+
+            let id = 1;
+            areas.forEach(area => {
+                for (let i = 1; i <= area.count; i++) {
+                    locations.push({
+                        id: id++,
+                        name: `${area.prefix}区-${area.name}-${i}号点`,
+                        area: area.name,
+                        target: `${area.prefix}${String(i).padStart(2, '0')}`,
+                        required: ['location', 'photo']
+                    });
+                }
+            });
+
+            document.getElementById('totalCount').textContent = locations.length;
+        }
+
+        // ===== 界面渲染 =====
+        function renderLocationList(filter = 'all') {
+            const list = document.getElementById('locationList');
+            const today = getTodayKey();
+
+            let filtered = locations;
+            if (filter === 'pending') {
+                filtered = locations.filter(loc => !todayRecords[today]?.[loc.id]);
+            } else if (filter === 'completed') {
+                filtered = locations.filter(loc => todayRecords[today]?.[loc.id]);
+            }
+
+            if (filtered.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">✨</div>
+                        <div>${filter === 'all' ? '暂无点位数据' : filter === 'pending' ? '太棒了！全部巡检完成！' : '暂无已完成记录'}</div>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = filtered.map(loc => {
+                const record = todayRecords[today]?.[loc.id];
+                const isCompleted = !!record;
+
+                return `
+                    <div class="location-item ${isCompleted ? 'completed' : 'pending'}">
+                        <div class="location-header">
+                            <div>
+                                <div class="location-name">${loc.name}</div>
+                                <div class="location-area">${loc.area}</div>
+                            </div>
+                            <span class="status-badge ${isCompleted ? 'done' : 'pending'}">
+                                ${isCompleted ? '✓ 已完成' : '○ 待巡检'}
+                            </span>
+                        </div>
+                        ${isCompleted ? `
+                            <div class="location-details">
+                                <div class="detail-item">🕐 ${record.time}</div>
+                                <div class="detail-item">📍 ${record.location || '未知'}</div>
+                            </div>
+                        ` : ''}
+                        <button class="check-btn ${isCompleted ? 'completed' : 'doing'}"
+                                onclick="openCheckModal(${loc.id})">
+                            ${isCompleted ? '✓ 查看详情' : '▶ 开始巡检'}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateStats() {
+            const today = getTodayKey();
+            const todayData = todayRecords[today] || {};
+            const completed = Object.keys(todayData).length;
+            const pending = locations.length - completed;
+            const rate = locations.length > 0 ? Math.round((completed / locations.length) * 100) : 0;
+
+            document.getElementById('completedCount').textContent = completed;
+            document.getElementById('pendingCount').textContent = pending;
+            document.getElementById('progressFill').style.width = rate + '%';
+
+            // 统计页面
+            document.getElementById('todayRate').textContent = rate + '%';
+            document.getElementById('todayRate').className = 'stat-big-value ' +
+                (rate >= 100 ? 'success' : rate >= 50 ? '' : 'warning');
+
+            // 计算本月累计
+            let monthCount = 0;
+            Object.keys(todayRecords).forEach(key => {
+                if (key.startsWith(getTodayKey().substring(0, 7))) {
+                    monthCount += Object.keys(todayRecords[key]).length;
+                }
+            });
+            document.getElementById('monthCount').textContent = monthCount + ' 次';
+
+            // 计算连续达标
+            let streak = 0;
+            let date = new Date();
+            for (let i = 0; i < 30; i++) {
+                const key = formatDateKey(date);
+                const dayData = todayRecords[key];
+                if (dayData && Object.keys(dayData).length >= locations.length) {
+                    streak++;
+                    date.setDate(date.getDate() - 1);
+                } else {
+                    break;
+                }
+            }
+            document.getElementById('streakDays').textContent = streak + ' 天';
+
+            renderWeekChart();
+        }
+
+        function renderWeekChart() {
+            const chart = document.getElementById('weekChart');
+            const days = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+            const today = new Date();
+            let bars = '';
+
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                const key = formatDateKey(date);
+                const dayData = todayRecords[key] || {};
+                const count = Object.keys(dayData).length;
+                const rate = locations.length > 0 ? Math.round((count / locations.length) * 100) : 0;
+                const height = Math.max(10, rate);
+                const dayName = days[date.getDay() === 0 ? 6 : date.getDay() - 1];
+
+                bars += `
+                    <div class="chart-bar ${count === 0 ? 'zero' : ''}" style="height: ${height}%">
+                        <span class="chart-value">${rate}%</span>
+                        <span class="chart-label">${dayName}</span>
+                    </div>
+                `;
+            }
+
+            chart.innerHTML = bars;
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('historyList');
+            const records = [];
+
+            Object.keys(todayRecords).sort().reverse().forEach(date => {
+                Object.keys(todayRecords[date]).forEach(locId => {
+                    const loc = locations.find(l => l.id === parseInt(locId));
+                    if (loc) {
+                        records.push({
+                            ...todayRecords[date][locId],
+                            locationName: loc.name,
+                            date: date
+                        });
+                    }
+                });
+            });
+
+            if (records.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <div>暂无巡检记录</div>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = records.slice(0, 50).map(r => `
+                <div class="record-item">
+                    <div class="record-icon success">✓</div>
+                    <div class="record-info">
+                        <div class="record-title">${r.locationName}</div>
+                        <div class="record-time">${r.date} ${r.time}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ===== 弹窗操作 =====
+        function openCheckModal(locId) {
+            currentLocationId = locId;
+            const loc = locations.find(l => l.id === locId);
+            const today = getTodayKey();
+            const record = todayRecords[today]?.[locId];
+
+            document.getElementById('modalTitle').textContent = loc.name;
+            document.getElementById('modalLocationInfo').innerHTML = `
+                <strong>区域：</strong>${loc.area}<br>
+                <strong>编号：</strong>${loc.target}
+            `;
+
+            if (record) {
+                document.getElementById('locationInfo').textContent = `已记录：${record.location || '未知'}`;
+                document.getElementById('remarkInput').value = record.remark || '';
+                if (record.photo) {
+                    document.getElementById('photoUpload').innerHTML = `<img src="${record.photo}" alt="照片">`;
+                    document.getElementById('photoUpload').classList.add('has-photo');
+                }
+            } else {
+                resetModal();
+            }
+
+            document.getElementById('checkModal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('checkModal').classList.remove('show');
+        }
+
+        function resetModal() {
+            currentLocation = null;
+            currentPhoto = null;
+            document.getElementById('locationInfo').textContent = '尚未获取定位';
+            document.getElementById('remarkInput').value = '';
+            document.getElementById('photoUpload').innerHTML = `
+                <div class="photo-upload-icon">📷</div>
+                <div class="photo-upload-text">点击上传照片</div>
+            `;
+            document.getElementById('photoUpload').classList.remove('has-photo');
+        }
+
+        // ===== 定位 =====
+        function getLocation() {
+            const btn = document.querySelector('.location-btn');
+            btn.innerHTML = '⏳ 定位中...';
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude.toFixed(6);
+                        const lng = position.coords.longitude.toFixed(6);
+                        currentLocation = `${lat}, ${lng}`;
+                        document.getElementById('locationInfo').innerHTML = `
+                            <strong>已获取：</strong>${currentLocation}<br>
+                            <small style="color:#888">经度 ${lng} | 纬度 ${lat}</small>
+                        `;
+                        btn.innerHTML = '✓ 定位成功';
+                    },
+                    (error) => {
+                        btn.innerHTML = '📍 点击重新获取';
+                        document.getElementById('locationInfo').textContent = '定位失败：' + error.message;
+                    },
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
+            } else {
+                btn.innerHTML = '📍 点击重新获取';
+                document.getElementById('locationInfo').textContent = '浏览器不支持定位功能';
+            }
+        }
+
+        // ===== 照片 =====
+        function handlePhoto(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentPhoto = e.target.result;
+                    document.getElementById('photoUpload').innerHTML = `<img src="${currentPhoto}" alt="照片">`;
+                    document.getElementById('photoUpload').classList.add('has-photo');
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // ===== 提交 =====
+        function submitCheck() {
+            const today = getTodayKey();
+
+            // 验证
+            if (!currentPhoto) {
+                showToast('请先上传现场照片');
+                return;
+            }
+
+            if (!todayRecords[today]) {
+                todayRecords[today] = {};
+            }
+
+            todayRecords[today][currentLocationId] = {
+                time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }),
+                location: currentLocation || '未获取定位',
+                photo: currentPhoto,
+                remark: document.getElementById('remarkInput').value
+            };
+
+            saveData();
+            updateStats();
+            renderLocationList(getCurrentFilter());
+            closeModal();
+            showToast('✓ 巡检记录已保存');
+        }
+
+        // ===== 工具函数 =====
+        function getTodayKey() {
+            return formatDateKey(new Date());
+        }
+
+        function formatDateKey(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function getCurrentFilter() {
+            const active = document.querySelector('.filter-btn.active');
+            return active ? active.dataset.filter : 'all';
+        }
+
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2000);
+        }
+
+        // ===== 数据存储 =====
+        function saveData() {
+            localStorage.setItem('pestControlRecords', JSON.stringify(todayRecords));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('pestControlRecords');
+            if (saved) {
+                todayRecords = JSON.parse(saved);
+            }
+        }
+
+        // ===== 导出 =====
+        function exportData() {
+            const today = getTodayKey();
+            const dayData = todayRecords[today] || {};
+            let csv = '点位编号,点位名称,区域,巡检时间,定位坐标,备注\n';
+
+            locations.forEach(loc => {
+                const record = dayData[loc.id];
+                if (record) {
+                    csv += `"${loc.target}","${loc.name}","${loc.area}","${record.time}","${record.location || ''}","${record.remark || ''}"\n`;
+                } else {
+                    csv += `"${loc.target}","${loc.name}","${loc.area}","未巡检","",""\n`;
+                }
+            });
+
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `消杀巡检报表_${today}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('报表已导出');
+        }
+
+        function markAllPending() {
+            if (confirm('确定要重置今日巡检状态吗？')) {
+                const today = getTodayKey();
+                delete todayRecords[today];
+                saveData();
+                updateStats();
+                renderLocationList(getCurrentFilter());
+                showToast('已重置为待巡检状态');
+            }
+        }
+
+        // ===== Tab 切换 =====
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                const tabName = tab.dataset.tab;
+                document.getElementById('listPage').classList.toggle('hidden', tabName !== 'list');
+                document.getElementById('statsPage').classList.toggle('hidden', tabName !== 'stats');
+                document.getElementById('historyPage').classList.toggle('hidden', tabName !== 'history');
+
+                if (tabName === 'stats') updateStats();
+                if (tabName === 'history') renderHistory();
+            });
+        });
+
+        // 筛选按钮
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderLocationList(btn.dataset.filter);
+            });
+        });
+
+        // 点击外部关闭弹窗
+        document.getElementById('checkModal').addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                closeModal();
+            }
+        });
+
+        // ===== 初始化 =====
+        function init() {
+            document.getElementById('currentDate').textContent = new Date().toLocaleDateString('zh-CN', {
+                year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'
+            });
+
+            initLocations();
+            loadData();
+            updateStats();
+            renderLocationList();
+        }
+
+        init();
+    </script>
+</body>
+</html>
