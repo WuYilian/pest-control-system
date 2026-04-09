@@ -1323,17 +1323,6 @@
         } else {
             init();
         }
-        
-        // 为确认按钮添加额外的事件监听（微信兼容）
-        document.addEventListener('click', function(e) {
-            if (e.target && e.target.id === 'submitBtn') {
-                submitCheck();
-            }
-            // 点击照片区域
-            if (e.target && e.target.closest('#photoUpload')) {
-                triggerPhotoUpload();
-            }
-        });
     </script>
 </body>
 </html>
