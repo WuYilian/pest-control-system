@@ -319,6 +319,16 @@
 
         .modal-body {
             padding: 20px;
+            padding-bottom: calc(20px + env(safe-area-inset-bottom));
+        }
+        
+        .modal-footer {
+            padding: 15px 20px;
+            padding-bottom: calc(15px + env(safe-area-inset-bottom));
+            border-top: 1px solid #eee;
+            background: white;
+            position: sticky;
+            bottom: 0;
         }
 
         .form-group {
@@ -384,17 +394,20 @@
 
         .submit-btn {
             width: 100%;
-            padding: 14px;
+            padding: 16px 20px;
             background: #1a73e8;
             color: white;
             border: none;
-            border-radius: 10px;
-            font-size: 16px;
+            border-radius: 12px;
+            font-size: 17px;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 10px;
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
+            -webkit-appearance: none;
+            user-select: none;
+            min-height: 54px;
+            box-sizing: border-box;
         }
 
         .submit-btn:active {
@@ -740,7 +753,8 @@
                     <label class="form-label">📝 备注说明</label>
                     <textarea class="form-input" id="remarkInput" rows="3" placeholder="请输入巡检情况说明（选填）"></textarea>
                 </div>
-
+            </div>
+            <div class="modal-footer">
                 <button class="submit-btn" onclick="submitCheck()">
                     ✅ 确认巡检完成
                 </button>
