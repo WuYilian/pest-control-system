@@ -1318,7 +1318,10 @@
             
             // 微信兼容：为按钮添加事件监听
             document.getElementById('submitBtn').addEventListener('click', submitCheck);
-            document.getElementById('photoUpload').addEventListener('click', triggerPhotoUpload);
+            document.getElementById('photoUpload').addEventListener('click', function(e) {
+                e.stopPropagation(); // 阻止冒泡，防止触发modal-overlay关闭
+                triggerPhotoUpload();
+            });
         }
 
         // 微信兼容：使用 addEventListener
