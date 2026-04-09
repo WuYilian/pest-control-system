@@ -755,7 +755,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="submit-btn" onclick="submitCheck()">
+                <button class="submit-btn" id="submitBtn" onclick="submitCheck()">
                     ✅ 确认巡检完成
                 </button>
             </div>
@@ -1291,7 +1291,23 @@
             console.log('5. 初始化完成');
         }
 
-        init();
+        // 微信兼容：使用 addEventListener
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+        
+        // 为确认按钮添加额外的事件监听（微信兼容）
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.id === 'submitBtn') {
+                submitCheck();
+            }
+            // 点击照片区域
+            if (e.target && e.target.closest('#photoUpload')) {
+                document.getElementById('photoInput').click();
+            }
+        });
     </script>
 </body>
 </html>
