@@ -1110,25 +1110,19 @@
         });
 
         function doSubmitInspection() {
-            alert('🚀 doSubmitInspection 开始！');
             console.log('doSubmitInspection 被调用');
-            console.log('currentPhoto:', currentPhoto);
-            console.log('currentLocationId:', currentLocationId);
 
             const today = getTodayKey();
-            alert('2. today=' + today);
 
             // 验证
             if (!currentPhoto) {
                 alert('请先上传现场照片');
                 return;
             }
-            alert('3. 照片验证通过');
 
             if (!todayRecords[today]) {
                 todayRecords[today] = {};
             }
-            alert('4. 保存记录');
 
             todayRecords[today][currentLocationId] = {
                 time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }),
@@ -1137,13 +1131,9 @@
                 remark: document.getElementById('remarkInput').value
             };
 
-            alert('5. 调用 saveData');
             saveData();
-            alert('6. 调用 updateStats');
             updateStats();
-            alert('7. 调用 renderLocationList');
             renderLocationList(getCurrentFilter());
-            alert('8. 调用 closeModal');
             closeModal();
             alert('✓ 巡检记录已保存');
         }
@@ -1235,9 +1225,50 @@
         }
         
         function saveData() {
-            alert('5a. 开始保存 (新版本)');
-            // 直接跳过所有保存操作，先完成流程
-            alert('5b. 保存完成');
+            try {
+                // 先清理旧数据，释放空间
+                cleanOldRecords();
+                // 保存数据
+                localStorage.setItem('pestControlRecords', JSON.stringify(todayRecords));
+                console.log('数据保存成功');
+            } catch(e) {
+                if (e.name === 'QuotaExceededError') {
+                    // 存储满了，清理更多旧数据
+                    console.log('存储空间不足，清理旧数据...');
+                    forceCleanOldRecords();
+                    try {
+                        localStorage.setItem('pestControlRecords', JSON.stringify(todayRecords));
+                    } catch(e2) {
+                        console.error('清理后仍然保存失败:', e2);
+                    }
+                }
+            }
+        }
+
+        // 清理超过30天的旧记录
+        function cleanOldRecords() {
+            const cutoffDate = new Date();
+            cutoffDate.setDate(cutoffDate.getDate() - 30);
+            const cutoffKey = formatDateKey(cutoffDate);
+
+            Object.keys(todayRecords).forEach(date => {
+                if (date < cutoffKey) {
+                    delete todayRecords[date];
+                }
+            });
+        }
+
+        // 强制清理，只保留最近7天
+        function forceCleanOldRecords() {
+            const cutoffDate = new Date();
+            cutoffDate.setDate(cutoffDate.getDate() - 7);
+            const cutoffKey = formatDateKey(cutoffDate);
+
+            Object.keys(todayRecords).forEach(date => {
+                if (date < cutoffKey) {
+                    delete todayRecords[date];
+                }
+            });
         }
 
         function loadData() {
