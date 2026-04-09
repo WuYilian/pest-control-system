@@ -635,7 +635,7 @@
                     <div class="stats-label">待巡检</div>
                 </div>
                 <div class="stats-item">
-                    <div class="stats-value" id="totalCount">70</div>
+                    <div class="stats-value" id="totalCount">897</div>
                     <div class="stats-label">总点位</div>
                 </div>
             </div>
@@ -780,7 +780,7 @@
             const filterBar = document.querySelector('.filter-bar');
             filterBar.innerHTML = `
                 <button class="filter-btn active" data-filter="all" onclick="renderLocationList('all')">全部</button>
-                ` + '${types.map(t => `<button class="filter-btn" data-filter="`+t+`" onclick="renderLocationList('`+t+`')">`+t+`</button>`).join('')}' + `
+                ${types.map(t => `<button class="filter-btn" data-filter="${t}" onclick="renderLocationList('${t}')">${t}</button>`).join('')}
                 <button class="filter-btn" data-filter="pending" onclick="renderLocationList('pending')">待巡检</button>
                 <button class="filter-btn" data-filter="completed" onclick="renderLocationList('completed')">已完成</button>
             `;
@@ -802,18 +802,9 @@
                 filtered = locations.filter(loc => todayRecords[today]?.[loc.id]);
             } else if (filter !== 'all') {
                 filtered = locations.filter(loc => loc.type === filter);
-            }// ===== 界面渲染 =====
-        function renderLocationList(filter = 'all') {
-            const list = document.getElementById('locationList');
-            const today = getTodayKey();
-
-            let filtered = locations;
-            if (filter === 'pending') {
-                filtered = locations.filter(loc => !todayRecords[today]?.[loc.id]);
-            } else if (filter === 'completed') {
-                filtered = locations.filter(loc => todayRecords[today]?.[loc.id]);
             }
 
+            // ===== 界面渲染 =====
             if (filtered.length === 0) {
                 list.innerHTML = `
                     <div class="empty-state">
