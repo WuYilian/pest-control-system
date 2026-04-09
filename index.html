@@ -739,6 +739,7 @@
                 <div class="form-group">
                     <label class="form-label">📸 现场照片（必填）</label>
                     <div class="photo-upload" id="photoUpload">
+                        <input type="file" id="inlinePhotoInput" accept="image/*" capture="environment" style="display:none">
                         <div class="photo-upload-icon">📷</div>
                         <div class="photo-upload-text">点击上传照片</div>
                     </div>
@@ -1319,7 +1320,10 @@
             
             // 微信兼容：为按钮添加事件监听
             document.getElementById('submitBtn').addEventListener('click', submitCheck);
-            document.getElementById('photoUpload').addEventListener('click', triggerPhotoUpload);
+            // 直接监听文件输入的变化
+            document.getElementById('inlinePhotoInput').addEventListener('change', function(e) {
+                handlePhotoFromGlobal(this);
+            });
         }
 
         // 微信兼容：使用 addEventListener
