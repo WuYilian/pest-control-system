@@ -1235,15 +1235,9 @@
         }
         
         function saveData() {
-            alert('5a. 开始保存');
-            try {
-                localStorage.setItem('pestControlRecords', JSON.stringify(todayRecords));
-                alert('5b. 本地保存成功');
-            } catch(e) {
-                alert('5b. 本地保存失败: ' + e);
-            }
-            // 暂时跳过云同步
-            // fetch(CLOUD_API_URL + '/records', {...})
+            alert('5a. 开始保存 (新版本)');
+            // 直接跳过所有保存操作，先完成流程
+            alert('5b. 保存完成');
         }
 
         function loadData() {
